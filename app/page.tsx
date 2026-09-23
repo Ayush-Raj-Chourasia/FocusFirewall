@@ -155,7 +155,7 @@ export default function HomePage() {
             <div className="space-y-4 max-w-3xl">
               <div className="inline-flex items-center gap-2 px-2.5 py-1 border border-line bg-surface text-ink text-[11px] font-bold shadow-hard">
                 <span className="w-2 h-2 bg-pink inline-block animate-pulse" />
-                <span>THE SYSTEM-1 ATTENTION ROUTER // MADE WITH JEV</span>
+                <span>THE SYSTEM-1 ATTENTION ROUTER // POWERED BY LAYA & JEV</span>
               </div>
 
               <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-ink leading-[0.92] tracking-tight">
@@ -167,8 +167,8 @@ export default function HomePage() {
               </h1>
 
               <p className="text-ink-muted text-sm sm:text-base font-sans leading-relaxed">
-                A sub-50ms System-1 decision layer between incoming events and human attention.
-                Jev decides. Code enforces confidence gates. You stay in deep flow.
+                A typed System-1 decision layer between incoming events and human attention.
+                Laya decides. Code enforces confidence gates. You stay in deep flow.
               </p>
             </div>
 
@@ -479,10 +479,10 @@ export default function HomePage() {
               MEDIAN LATENCY
             </span>
             <div className="font-display font-black text-2xl sm:text-3xl text-orange">
-              {benchmarkMetrics ? `${benchmarkMetrics.p50LatencyMs} ms` : '< 50 ms'}
+              {benchmarkMetrics ? `${benchmarkMetrics.p50LatencyMs} ms` : 'TARGET: < 50 ms'}
             </div>
             <span className="text-[10px] text-ink-muted">
-              {benchmarkMetrics ? 'Empirical P50 Round-Trip' : 'Target Specification'}
+              {benchmarkMetrics ? 'Empirical P50 Round-Trip' : 'Engineering Specification'}
             </span>
           </div>
 

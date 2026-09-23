@@ -63,22 +63,22 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      {/* Technical Comparison: System-1 vs Generic LLM */}
+      {/* Technical Comparison: System-1 vs Generic Generative LLM */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="panel-window bg-surface p-4 space-y-3">
           <div className="flex items-center gap-2 border-b border-line pb-2">
             <span className="w-3 h-3 bg-danger inline-block" />
             <strong className="text-ink font-bold uppercase text-sm">
-              Standard Generative AI Approach (Slow & Flaky)
+              Generic Generative LLM Approach
             </strong>
           </div>
           <ul className="space-y-2 text-[11px] text-ink-muted list-disc list-inside">
-            <li>Takes raw event and asks a 70B parameter model to summarize it.</li>
-            <li>Generates 3 paragraphs explaining whether you should read it.</li>
-            <li>Latency: 1,500ms – 4,000ms per event.</li>
-            <li>Prone to JSON parsing errors and markdown formatting failures.</li>
-            <li>No explicit probability distribution or calibration.</li>
-            <li>High cost per decision; cannot run 500 times a day in background.</li>
+            <li>Takes raw event and asks a conversational model to summarize and explain it.</li>
+            <li>Generates conversational prose before arriving at a decision.</li>
+            <li>Large token footprint and high multi-second time-to-first-token.</li>
+            <li>Requires regex or fragile JSON parsing over open-ended text generations.</li>
+            <li>No explicit probability distribution across attention actions.</li>
+            <li>High cost per call; impractical for continuous OS background filtering.</li>
           </ul>
         </div>
 
@@ -86,16 +86,16 @@ export default function HowItWorksPage() {
           <div className="flex items-center gap-2 border-b border-line pb-2">
             <span className="w-3 h-3 bg-brandgreen inline-block" />
             <strong className="text-ink font-bold uppercase text-sm">
-              FocusFirewall System-1 Approach (Fast & Typed)
+              FocusFirewall System-1 Approach (Laya / Jev)
             </strong>
           </div>
           <ul className="space-y-2 text-[11px] text-ink list-disc list-inside">
-            <li>Combines raw event + user context into a compact state JSON.</li>
-            <li>Asks fixed typed questions: Choice (4 actions), Score (0-4), Noul (binary).</li>
-            <li>Latency: 20ms – 90ms end-to-end.</li>
-            <li>Zero tokens generated = zero hallucinated schema syntax.</li>
-            <li>Returns calibrated probability distribution across actions.</li>
-            <li>Deterministic confidence gate enforces safety rules in code.</li>
+            <li>Combines raw event + user context into a compact state JSON payload.</li>
+            <li>Fixed typed questions: Choice (4 actions), Score (0-4), Noul (binary).</li>
+            <li>Zero tokens generated = zero hallucinated schema syntax or JSON repair.</li>
+            <li>Returns normalized probability distribution across all 4 attention actions.</li>
+            <li>Deterministic confidence gate enforces strict safety rules in code.</li>
+            <li>Measured empirical latency captured and reported from actual runs.</li>
           </ul>
         </div>
       </div>

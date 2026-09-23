@@ -182,22 +182,34 @@ export function DecisionInspector({
         </div>
 
         {/* Engine & Latency telemetry */}
-        <div className="border-t border-line/40 pt-3 space-y-1 text-[11px] bg-paper-2 p-2 border border-line">
+        <div className="border-t border-line/40 pt-3 space-y-1.5 text-[11px] bg-paper-2 p-2 border border-line">
           <div className="flex justify-between items-center">
-            <span className="text-ink-muted">Engine:</span>
+            <span className="text-ink-muted">Requested Engine:</span>
+            <span className="font-bold text-ink uppercase">
+              {decision.requestedEngine ? decision.requestedEngine.toUpperCase() : 'MOCK'}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-ink-muted">Executed Engine:</span>
             <span className="font-bold text-pink uppercase flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-brandgreen inline-block animate-pulse" />
-              {decision.engine === 'jev' ? 'JEV (LIVE)' : decision.engine.toUpperCase()}
+              <span
+                className={`w-1.5 h-1.5 rounded-full inline-block ${
+                  decision.engine === 'rules' ? 'bg-orange' : 'bg-brandgreen animate-pulse'
+                }`}
+              />
+              {decision.engine.toUpperCase()}{' '}
+              {decision.engine === 'rules' ? '(FALLBACK)' : ''}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-ink-muted">Round-Trip Latency:</span>
+            <span className="text-ink-muted">Latency:</span>
             <span className="font-bold text-orange">
-              {decision.latencyMs !== undefined ? `${decision.latencyMs} ms` : '—'}
+              {decision.latencyMs !== undefined ? `${decision.latencyMs} ms` : '—'}{' '}
+              <span className="text-[9px] text-ink-muted font-normal">(measured)</span>
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-ink-muted">Evaluated Under:</span>
+            <span className="text-ink-muted">Context Mode:</span>
             <span className="font-bold uppercase text-ink">
               {context.mode.replace('_', ' ')}
             </span>
