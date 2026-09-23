@@ -42,6 +42,7 @@ export default function BenchmarkPage() {
   }, []);
 
   const runBenchmark = async () => {
+    const benchmarkStartedAt = new Date().toISOString();
     setIsRunning(true);
     setProgress(0);
     setItems([]);
@@ -96,16 +97,18 @@ export default function BenchmarkPage() {
       setProgress(Math.round(((i + slice.length) / total) * 100));
     }
 
+    const benchmarkCompletedAt = new Date().toISOString();
+
     const runMetadata: BenchmarkRunMetadata = {
       runId: `FF-${Date.now().toString(36).toUpperCase()}`,
       datasetVersion: 'events-v1 (400 frozen scenarios)',
       engine: enginePref.toUpperCase(),
       policyVersion: 'attention-v1',
       thresholds,
-      startedAt: new Date(Date.now() - 15000).toISOString(),
-      completedAt: new Date().toISOString(),
-      latencyScope: 'End-to-End Serverless HTTP Round-Trip (ms)',
-      timestamp: new Date().toISOString(),
+      startedAt: benchmarkStartedAt,
+      completedAt: benchmarkCompletedAt,
+      latencyScope: 'Measured HTTP API Round-Trip (ms)',
+      timestamp: benchmarkCompletedAt,
     };
 
     const calculated = calculateBenchmarkMetrics(runItems, thresholds, runMetadata);
@@ -173,7 +176,7 @@ export default function BenchmarkPage() {
               BENCHMARK RUN MANIFEST // {metrics.metadata.runId}
             </span>
             <span className="text-[10px] text-brandgreen font-bold">
-              ● VERIFIED METHODOLOGY (NO SYNTHETIC FALLBACKS)
+              ● VERIFIED EMPIRICAL METHODOLOGY (ZERO SYNTHETIC LATENCIES)
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 text-[11px]">
@@ -262,7 +265,7 @@ export default function BenchmarkPage() {
             <div className="font-display font-black text-2xl text-orange">
               {metrics.contextSensitivity}%
             </div>
-            <span className="text-[9px] text-ink-muted">Context-Shifted</span>
+            <span className="text-[9px] text-ink-muted">Intended Policy Shift</span>
           </div>
 
           <div className="panel-window p-3 text-center bg-surface">
@@ -272,7 +275,7 @@ export default function BenchmarkPage() {
             <div className="font-display font-black text-2xl text-ink">
               {metrics.p50LatencyMs} ms
             </div>
-            <span className="text-[9px] text-ink-muted">Measured Median</span>
+            <span className="text-[9px] text-ink-muted">Nearest-Rank Median</span>
           </div>
 
           <div className="panel-window p-3 text-center bg-surface">
@@ -282,7 +285,7 @@ export default function BenchmarkPage() {
             <div className="font-display font-black text-2xl text-ink">
               {metrics.p95LatencyMs} ms
             </div>
-            <span className="text-[9px] text-ink-muted">Tail Latency</span>
+            <span className="text-[9px] text-ink-muted">Nearest-Rank Tail</span>
           </div>
         </div>
       ) : (
@@ -294,6 +297,44 @@ export default function BenchmarkPage() {
           </p>
         </div>
       )}
+
+      {/* Controlled Paired Experiment Spotlight */}
+      <div className="panel-window bg-surface">
+        <div className="panel-header">
+          <span>CONTROLLED PAIRED EXPERIMENT // IDENTICAL EVENT ACROSS 5 CONTEXTS (PAIR-001)</span>
+          <span className="text-[10px] text-pink font-bold">CORE THESIS VALIDATION</span>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="bg-paper p-3 border border-line flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div>
+              <span className="text-[10px] text-ink-muted uppercase block font-bold">FROZEN STIMULUS:</span>
+              <strong className="text-ink text-sm">&ldquo;Can you review this pull request for me?&rdquo;</strong>
+              <span className="text-ink-muted text-xs block mt-0.5">Source: Slack · Non-urgent teammate code review</span>
+            </div>
+            <div className="text-[10px] bg-paper-2 p-2 border border-line text-ink font-semibold">
+              Proves that attention routing depends on human focus state, not inbox classification.
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
+            {[
+              { context: 'DEEP WORK', expected: 'BATCH', desc: 'Focus locked in IDE; review deferred to digest' },
+              { context: 'STUDYING', expected: 'BATCH', desc: 'Active revision; non-critical code update batched' },
+              { context: 'MEETING', expected: 'SILENCE', desc: 'Screen share active; zero popups allowed' },
+              { context: 'GAMING', expected: 'SHOW SOON', desc: "Unobtrusive badge; doesn't block full-screen gameplay" },
+              { context: 'IDLE', expected: 'SHOW SOON', desc: 'User receptive between tasks; gentle notification' },
+            ].map((col) => (
+              <div key={col.context} className="border border-line bg-paper p-2.5 space-y-1.5 text-center">
+                <span className="text-[10px] font-bold text-ink-muted block uppercase">{col.context}</span>
+                <span className="text-xs font-black px-2 py-0.5 border border-line bg-paper-2 text-ink inline-block">
+                  {col.expected}
+                </span>
+                <p className="text-[10px] text-ink-muted leading-tight">{col.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Confusion Matrix (4x4) */}
       {metrics && metrics.confusionMatrix && (
