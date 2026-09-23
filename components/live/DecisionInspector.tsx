@@ -147,44 +147,51 @@ export function DecisionInspector({
           })}
         </div>
 
-        {/* Signals: Urgency & Noul Flags */}
-        <div className="border-t border-line/40 pt-3 space-y-1.5 text-[11px]">
-          <div className="flex justify-between">
+        {/* Structured Decision Trace: WHY [ACTION]? */}
+        <div className="border border-line bg-paper p-2.5 space-y-2">
+          <div className="flex items-center justify-between text-[10px] font-bold text-ink border-b border-line/40 pb-1">
+            <span className="text-pink">WHY {decision.action.replace('_', ' ').toUpperCase()}?</span>
+            <span className="text-ink-muted">STRUCTURED TRACE</span>
+          </div>
+          <div className="grid grid-cols-2 gap-y-1 text-[11px]">
             <span className="text-ink-muted">Urgency Score:</span>
-            <strong className="text-ink font-bold">
+            <span className="font-bold text-right text-ink">
               {decision.urgencyScore !== undefined ? `${decision.urgencyScore} / 4` : '—'}
-            </strong>
-          </div>
-          <div className="flex justify-between">
+            </span>
+
             <span className="text-ink-muted">Action Required:</span>
-            <strong className="text-ink">
+            <span className="font-bold text-right text-ink">
               {decision.requiresUserAction ? 'YES' : 'NO'}
-            </strong>
-          </div>
-          <div className="flex justify-between">
+            </span>
+
             <span className="text-ink-muted">High Consequence:</span>
-            <strong className="text-ink">
+            <span className="font-bold text-right text-ink">
               {decision.highConsequence ? 'YES' : 'NO'}
-            </strong>
-          </div>
-          <div className="flex justify-between">
+            </span>
+
             <span className="text-ink-muted">Context Conflict:</span>
-            <strong className="text-ink">
+            <span className="font-bold text-right text-ink">
               {decision.contextConflict ? 'YES' : 'NO'}
-            </strong>
+            </span>
+
+            <span className="text-ink-muted">Safety Gate:</span>
+            <span className="font-bold text-right text-pink">
+              {decision.gatedReason ? 'OVERRIDDEN' : 'PASSED'}
+            </span>
           </div>
         </div>
 
         {/* Engine & Latency telemetry */}
         <div className="border-t border-line/40 pt-3 space-y-1 text-[11px] bg-paper-2 p-2 border border-line">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <span className="text-ink-muted">Engine:</span>
-            <span className="font-bold text-ink uppercase">
-              {decision.engine === 'jev' ? 'JEV (API)' : decision.engine.toUpperCase()}
+            <span className="font-bold text-pink uppercase flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-brandgreen inline-block animate-pulse" />
+              {decision.engine === 'jev' ? 'JEV (LIVE)' : decision.engine.toUpperCase()}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-ink-muted">Decision Latency:</span>
+            <span className="text-ink-muted">Round-Trip Latency:</span>
             <span className="font-bold text-orange">
               {decision.latencyMs !== undefined ? `${decision.latencyMs} ms` : '—'}
             </span>
