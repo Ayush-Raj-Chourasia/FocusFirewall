@@ -95,16 +95,32 @@ export interface BenchmarkScenario {
 
 export interface BenchmarkRunItem {
   scenario: BenchmarkScenario;
-  decision: DecisionResult;
+  decision?: DecisionResult;
   agreed: boolean;
+  error?: boolean;
+  errorMessage?: string;
   criticalRecallHit?: boolean;
   falseInterruption?: boolean;
   suppressionPrecisionHit?: boolean;
 }
 
+export interface BenchmarkRunMetadata {
+  runId: string;
+  datasetVersion: string;
+  policyVersion: string;
+  engine: string;
+  thresholds: ConfidenceThresholds;
+  startedAt: string;
+  completedAt: string;
+  latencyScope: string;
+  timestamp?: string;
+}
+
 export interface BenchmarkMetrics {
   totalScenarios: number;
   completedScenarios: number;
+  evaluatedCount: number;
+  errorCount: number;
   routingAgreement: number; // percentage (0-100)
   criticalRecall: number; // percentage (0-100)
   falseInterruptionRate: number; // percentage (0-100)
@@ -117,6 +133,8 @@ export interface BenchmarkMetrics {
   actionDistribution: Record<AttentionAction, number>;
   engineBreakdown: Record<string, number>;
   difficultyBreakdown: Record<string, { total: number; correct: number }>;
+  confusionMatrix: Record<AttentionAction, Record<AttentionAction, number>>;
+  metadata?: BenchmarkRunMetadata;
 }
 
 export interface ConfidenceThresholds {

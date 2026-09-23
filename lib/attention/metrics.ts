@@ -2,19 +2,31 @@ import {
   AttentionAction,
   BenchmarkMetrics,
   BenchmarkRunItem,
+  BenchmarkRunMetadata,
   ConfidenceThresholds,
 } from './types';
 import { DEFAULT_THRESHOLDS } from './policy';
 
 export function calculateBenchmarkMetrics(
   items: BenchmarkRunItem[],
-  thresholds: ConfidenceThresholds = DEFAULT_THRESHOLDS
+  thresholds: ConfidenceThresholds = DEFAULT_THRESHOLDS,
+  metadata?: BenchmarkRunMetadata
 ): BenchmarkMetrics {
   const total = items.length;
+
+  const emptyMatrix = (): Record<AttentionAction, Record<AttentionAction, number>> => ({
+    interrupt_now: { interrupt_now: 0, show_soon: 0, batch: 0, silence: 0 },
+    show_soon: { interrupt_now: 0, show_soon: 0, batch: 0, silence: 0 },
+    batch: { interrupt_now: 0, show_soon: 0, batch: 0, silence: 0 },
+    silence: { interrupt_now: 0, show_soon: 0, batch: 0, silence: 0 },
+  });
+
   if (total === 0) {
     return {
       totalScenarios: 0,
       completedScenarios: 0,
+      evaluatedCount: 0,
+      errorCount: 0,
       routingAgreement: 0,
       criticalRecall: 0,
       falseInterruptionRate: 0,
@@ -32,6 +44,8 @@ export function calculateBenchmarkMetrics(
       },
       engineBreakdown: {},
       difficultyBreakdown: {},
+      confusionMatrix: emptyMatrix(),
+      metadata,
     };
   }
 
@@ -43,6 +57,7 @@ export function calculateBenchmarkMetrics(
   let expectedSilenceCount = 0;
   let suppressionPrecisionHits = 0;
   let aboveConfidenceThresholdCount = 0;
+  let errorCount = 0;
 
   const latencies: number[] = [];
   const actionDistribution: Record<AttentionAction, number> = {
@@ -53,12 +68,26 @@ export function calculateBenchmarkMetrics(
   };
   const engineBreakdown: Record<string, number> = {};
   const difficultyBreakdown: Record<string, { total: number; correct: number }> = {};
+  const confusionMatrix = emptyMatrix();
 
   const pairMap = new Map<string, { action: AttentionAction; expected: AttentionAction; context: string }[]>();
 
   for (const item of items) {
-    const { scenario, decision } = item;
+    const { scenario, decision, error } = item;
+
+    // Methodological rule: Errors are tracked explicitly and excluded from performance ratios
+    if (error || !decision) {
+      errorCount += 1;
+      continue;
+    }
+
     const finalAction = decision.action;
+    const expectedAction = scenario.expected_action;
+
+    // Confusion Matrix: [Expected][Routed]
+    if (confusionMatrix[expectedAction] && confusionMatrix[expectedAction][finalAction] !== undefined) {
+      confusionMatrix[expectedAction][finalAction] += 1;
+    }
 
     // Distribution
     actionDistribution[finalAction] = (actionDistribution[finalAction] || 0) + 1;
@@ -71,14 +100,14 @@ export function calculateBenchmarkMetrics(
     }
     difficultyBreakdown[diff].total += 1;
 
-    // Agreement
-    if (finalAction === scenario.expected_action) {
+    // Routing Agreement
+    if (finalAction === expectedAction) {
       agreedCount += 1;
       difficultyBreakdown[diff].correct += 1;
     }
 
-    // Critical Recall: events where ground truth is interrupt_now -> routed to interrupt_now or show_soon
-    if (scenario.expected_action === 'interrupt_now') {
+    // Critical Recall: expected interrupt_now -> routed to interrupt_now or show_soon
+    if (expectedAction === 'interrupt_now') {
       expectedInterruptCount += 1;
       if (finalAction === 'interrupt_now' || finalAction === 'show_soon') {
         criticalRecallHits += 1;
@@ -92,7 +121,7 @@ export function calculateBenchmarkMetrics(
     }
 
     // Suppression Precision: expected silence -> routed to silence
-    if (scenario.expected_action === 'silence') {
+    if (expectedAction === 'silence') {
       expectedSilenceCount += 1;
       if (finalAction === 'silence') {
         suppressionPrecisionHits += 1;
@@ -105,26 +134,25 @@ export function calculateBenchmarkMetrics(
       aboveConfidenceThresholdCount += 1;
     }
 
-    // Latency
-    if (typeof decision.latencyMs === 'number' && !isNaN(decision.latencyMs)) {
+    // Measured Latency (excludes fake / error latency)
+    if (typeof decision.latencyMs === 'number' && !isNaN(decision.latencyMs) && decision.latencyMs > 0) {
       latencies.push(decision.latencyMs);
     }
 
-    // Paired tracking
+    // Paired tracking for context sensitivity
     if (scenario.pairId) {
       const list = pairMap.get(scenario.pairId) || [];
-      list.push({ action: finalAction, expected: scenario.expected_action, context: scenario.context });
+      list.push({ action: finalAction, expected: expectedAction, context: scenario.context });
       pairMap.set(scenario.pairId, list);
     }
   }
 
-  // Calculate Context Sensitivity over pairs
+  // Calculate Context Sensitivity over paired controlled scenarios
   let pairedSetsCount = 0;
   let contextSensitivityHits = 0;
   for (const [, pairList] of pairMap.entries()) {
     if (pairList.length >= 2) {
       pairedSetsCount += 1;
-      // Check if decisions differed when contexts differed as expected
       const first = pairList[0];
       const second = pairList[1];
       if (first.expected !== second.expected && first.action !== second.action) {
@@ -133,6 +161,8 @@ export function calculateBenchmarkMetrics(
     }
   }
 
+  const evaluatedCount = total - errorCount;
+
   latencies.sort((a, b) => a - b);
   const p50 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.5)] : 0;
   const p95 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.95)] : 0;
@@ -140,8 +170,10 @@ export function calculateBenchmarkMetrics(
 
   return {
     totalScenarios: total,
-    completedScenarios: items.length,
-    routingAgreement: total > 0 ? Number(((agreedCount / total) * 100).toFixed(1)) : 0,
+    completedScenarios: total,
+    evaluatedCount,
+    errorCount,
+    routingAgreement: evaluatedCount > 0 ? Number(((agreedCount / evaluatedCount) * 100).toFixed(1)) : 0,
     criticalRecall:
       expectedInterruptCount > 0
         ? Number(((criticalRecallHits / expectedInterruptCount) * 100).toFixed(1))
@@ -159,12 +191,14 @@ export function calculateBenchmarkMetrics(
         ? Number(((contextSensitivityHits / pairedSetsCount) * 100).toFixed(1))
         : 100,
     confidenceCoverage:
-      total > 0 ? Number(((aboveConfidenceThresholdCount / total) * 100).toFixed(1)) : 0,
+      evaluatedCount > 0 ? Number(((aboveConfidenceThresholdCount / evaluatedCount) * 100).toFixed(1)) : 0,
     p50LatencyMs: Math.round(p50),
     p95LatencyMs: Math.round(p95),
     meanLatencyMs: Math.round(mean),
     actionDistribution,
     engineBreakdown,
     difficultyBreakdown,
+    confusionMatrix,
+    metadata,
   };
 }
