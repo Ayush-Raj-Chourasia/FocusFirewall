@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500..700;1,500..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #F3EEDF;
+  --paper-2: #E7E0D1;
+  --ink: #11110F;
+  --ink-muted: #5E5B53;
+  --line: #1B1A17;
+  --pink: #F04F96;
+  --orange: #F26422;
+  --white: #FFFDF7;
+  --danger: #D6352F;
+  --green: #4D7A48;
+}
+
+@layer base {
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Paper grain noise overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Archivo Narrow', Impact, 'Arial Narrow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+}
+
+/* Custom retro-technical components */
+@layer components {
+  .btn-retro {
+    @apply inline-flex items-center justify-center font-mono text-xs uppercase font-bold tracking-wider px-3.5 py-2 border border-line bg-surface hover:bg-paper transition-all duration-150 shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-none;
+  }
+
+  .btn-retro-pink {
+    @apply inline-flex items-center justify-center font-mono text-xs uppercase font-bold tracking-wider px-4 py-2.5 border border-line bg-pink text-white hover:bg-pink-hover transition-all duration-150 shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-none;
+  }
+
+  .btn-retro-orange {
+    @apply inline-flex items-center justify-center font-mono text-xs uppercase font-bold tracking-wider px-4 py-2.5 border border-line bg-orange text-white hover:bg-orange-hover transition-all duration-150 shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-none;
+  }
+
+  .btn-retro-outline {
+    @apply inline-flex items-center justify-center font-mono text-xs uppercase font-bold tracking-wider px-3.5 py-2 border border-line bg-transparent hover:bg-line hover:text-white transition-all duration-150;
+  }
+
+  .panel-window {
+    @apply border border-line bg-surface shadow-hard relative;
+  }
+
+  .panel-header {
+    @apply bg-line text-surface px-3 py-1.5 flex items-center justify-between font-mono text-xs uppercase tracking-wider font-semibold border-b border-line;
+  }
+
+  .tag-badge {
+    @apply font-mono text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 border border-line inline-flex items-center gap-1;
+  }
+}
+
+/* Action-specific badges */
+.action-badge-interrupt_now {
+  background-color: var(--danger);
+  color: #fff;
+  border-color: var(--line);
+}
+.action-badge-show_soon {
+  background-color: var(--orange);
+  color: #fff;
+  border-color: var(--line);
+}
+.action-badge-batch {
+  background-color: var(--paper-2);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.action-badge-silence {
+  background-color: #3f3d38;
+  color: #fff;
+  border-color: var(--line);
+}
