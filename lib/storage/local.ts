@@ -56,13 +56,13 @@ export function saveStoredThresholds(thresholds: ConfidenceThresholds): void {
 }
 
 export function loadEnginePreference(): 'laya' | 'jev' | 'mock' {
-  if (typeof window === 'undefined') return 'laya';
+  if (typeof window === 'undefined') return 'mock';
   try {
     const pref = localStorage.getItem(ENGINE_KEY);
-    if (pref === 'jev' || pref === 'mock') return pref;
-    return 'laya';
+    if (pref === 'jev' || pref === 'laya' || pref === 'mock') return pref;
+    return 'mock';
   } catch {
-    return 'laya';
+    return 'mock';
   }
 }
 

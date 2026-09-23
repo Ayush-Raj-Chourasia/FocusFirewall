@@ -188,8 +188,8 @@ export class MockEngine implements DecisionEngine {
     const gateResult = applyConfidenceGate(rawAction, confidence, thresholds);
 
     const end = performance.now();
-    // Simulate real microsecond-to-millisecond network/inference latency (e.g. 24 - 58ms)
-    const simulatedLatency = Math.round(end - start + 24 + Math.random() * 32);
+    // Honest empirical measurement: actual local computation time (no artificial +24-56ms additions or random noise)
+    const measuredLatency = Math.max(1, Math.round(end - start));
 
     return {
       action: gateResult.finalAction,
@@ -197,7 +197,9 @@ export class MockEngine implements DecisionEngine {
       probabilities: normalizedProbs,
       confidence,
       engine: 'mock',
-      latencyMs: simulatedLatency,
+      requestedEngine: 'mock',
+      latencyMs: measuredLatency,
+      latencySource: 'measured',
       timestamp: new Date().toISOString(),
       questionVersion: QUESTION_VERSION,
       urgencyScore,

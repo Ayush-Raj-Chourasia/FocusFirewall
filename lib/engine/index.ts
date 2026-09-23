@@ -15,20 +15,12 @@ export function getEngine(preferred?: 'jev' | 'mock' | 'laya'): DecisionEngine {
     if (jev.hasApiKey()) {
       return jev;
     }
-    // If Jev requested without API key, use Laya open-source engine
-    return laya;
-  }
-
-  if (preferred === 'mock') {
-    return new MockEngine();
-  }
-
-  // Default: if Jev key present, use Jev; else use Laya
-  if (jev.hasApiKey()) {
+    // If Jev requested without API key, return jev anyway (which triggers explicit rules fallback with explanation)
     return jev;
   }
 
-  return laya;
+  // Default to Mock deterministic engine for zero-dependency public runtime
+  return new MockEngine();
 }
 
 export * from './types';

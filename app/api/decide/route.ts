@@ -38,13 +38,19 @@ export async function POST(req: NextRequest) {
         thresholds: effectiveThresholds,
       });
 
-      return NextResponse.json(decision);
+      return NextResponse.json({
+        ...decision,
+        requestedEngine: preferredEngine || engine.name,
+      });
     } catch (engineError) {
       console.warn('Engine error occurred, running deterministic rules fallback:', engineError);
       const fallback = runDeterministicFallback(event, context);
       return NextResponse.json({
         ...fallback,
-        gatedReason: `Engine fallback applied: ${engineError instanceof Error ? engineError.message : 'Unknown error'}`,
+        engine: 'rules',
+        requestedEngine: preferredEngine || engine.name,
+        latencySource: 'measured',
+        gatedReason: `Engine execution fallback: ${engineError instanceof Error ? engineError.message : 'Unknown error'}`,
       });
     }
   } catch (err) {

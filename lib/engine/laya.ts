@@ -106,7 +106,9 @@ export class LayaEngine implements DecisionEngine {
         probabilities,
         confidence,
         engine: 'laya',
+        requestedEngine: 'laya',
         latencyMs: realLatency,
+        latencySource: 'measured',
         timestamp: new Date().toISOString(),
         questionVersion: QUESTION_VERSION,
         urgencyScore,
@@ -207,22 +209,24 @@ export class LayaEngine implements DecisionEngine {
       }
 
       const gateResult = applyConfidenceGate(rawAction, confidence, thresholds);
-      const measuredLatency = Math.round(performance.now() - start + 28);
+      const measuredLatency = Math.max(1, Math.round(performance.now() - start));
 
       return {
         action: gateResult.finalAction,
         rawAction,
         probabilities,
         confidence,
-        engine: 'laya',
+        engine: 'rules',
+        requestedEngine: 'laya',
         latencyMs: measuredLatency,
+        latencySource: 'measured',
         timestamp: new Date().toISOString(),
         questionVersion: QUESTION_VERSION,
         urgencyScore,
         requiresUserAction,
         highConsequence,
         contextConflict,
-        gatedReason: gateResult.reason,
+        gatedReason: gateResult.reason || 'Laya service offline; local deterministic heuristic fallback applied',
       };
     }
   }

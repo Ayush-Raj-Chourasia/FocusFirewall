@@ -89,7 +89,9 @@ export class JevEngine implements DecisionEngine {
         probabilities,
         confidence,
         engine: 'jev',
+        requestedEngine: 'jev',
         latencyMs,
+        latencySource: 'measured',
         timestamp: new Date().toISOString(),
         questionVersion: QUESTION_VERSION,
         urgencyScore,
@@ -100,10 +102,14 @@ export class JevEngine implements DecisionEngine {
       };
     } catch (err: unknown) {
       console.error('Jev engine execution error, falling back to deterministic policy:', err);
-      // Fallback
       const fallback = runDeterministicFallback(event, context);
+      const latencyMs = Math.max(1, Math.round(performance.now() - start));
       return {
         ...fallback,
+        engine: 'rules',
+        requestedEngine: 'jev',
+        latencyMs,
+        latencySource: 'measured',
         gatedReason: `Jev API call failed: ${err instanceof Error ? err.message : String(err)}. Deterministic rules applied.`,
       };
     }
