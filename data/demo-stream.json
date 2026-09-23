@@ -1,0 +1,182 @@
+[
+  {
+    "id": "demo-01",
+    "timestamp": "14:37:01",
+    "source": "github",
+    "sender": "ci-bot",
+    "title": "CI failure on main branch",
+    "body": "Build #4182 failed on test stage: integration/auth.test.ts exited with code 1.",
+    "metadata": { "repo": "acme/api", "branch": "main" }
+  },
+  {
+    "id": "demo-02",
+    "timestamp": "14:37:04",
+    "source": "slack",
+    "sender": "sarah.chen",
+    "title": "Can you review this PR whenever you get a chance?",
+    "body": "Hey, submitted PR #182 for the dark mode refactor. No rush at all, tomorrow morning is fine.",
+    "metadata": { "channel": "#frontend" }
+  },
+  {
+    "id": "demo-03",
+    "timestamp": "14:37:08",
+    "source": "email",
+    "sender": "Substack Weekly",
+    "title": "Issue #84: The Evolution of Local AI Models",
+    "body": "In this issue we explore 300M parameter models and why typed classification is overtaking chat.",
+    "metadata": { "category": "newsletter" }
+  },
+  {
+    "id": "demo-04",
+    "timestamp": "14:37:12",
+    "source": "calendar",
+    "sender": "Google Calendar",
+    "title": "Quarterly Planning Sync in 12 minutes",
+    "body": "Starts at 14:50. Google Meet link: meet.google.com/xyz-qwe-asd with Engineering Leads.",
+    "metadata": { "urgent": true }
+  },
+  {
+    "id": "demo-05",
+    "timestamp": "14:37:15",
+    "source": "discord",
+    "sender": "alex_99",
+    "title": "bro 😂 look at this commit message",
+    "body": "git commit -m 'fixed the thing that was broken because Dave touched it'",
+    "metadata": { "server": "dev-banter" }
+  },
+  {
+    "id": "demo-06",
+    "timestamp": "14:37:19",
+    "source": "system",
+    "sender": "Power Management",
+    "title": "Battery at 12% — Connect to Power",
+    "body": "Approximately 18 minutes of power remaining. Estimated shutdown at 14:55.",
+    "metadata": { "level": 12 }
+  },
+  {
+    "id": "demo-07",
+    "timestamp": "14:37:22",
+    "source": "github",
+    "sender": "dependabot[bot]",
+    "title": "Bump rollup from 4.20.0 to 4.21.0",
+    "body": "Bumps rollup from 4.20.0 to 4.21.0. Non-breaking security maintenance update.",
+    "metadata": { "type": "bot-pr" }
+  },
+  {
+    "id": "demo-08",
+    "timestamp": "14:37:25",
+    "source": "slack",
+    "sender": "marcus.lead",
+    "title": "Need decision before 5 PM: Launch staging to EU cluster?",
+    "body": "Infra team needs sign-off on the Frankfurt deployment region before 17:00.",
+    "metadata": { "priority": "high" }
+  },
+  {
+    "id": "demo-09",
+    "timestamp": "14:37:28",
+    "source": "email",
+    "sender": "Vercel Product",
+    "title": "Introducing Next-Gen Fluid Compute",
+    "body": "Deploy serverless workloads with zero cold starts and instant scaling across edge nodes.",
+    "metadata": { "category": "marketing" }
+  },
+  {
+    "id": "demo-10",
+    "timestamp": "14:37:31",
+    "source": "calendar",
+    "sender": "Google Calendar",
+    "title": "Incident Triage rescheduled to NOW",
+    "body": "Organizer moved 'Incident 804 Triage' from 15:30 to 14:38.",
+    "metadata": { "moved": true }
+  },
+  {
+    "id": "demo-11",
+    "timestamp": "14:37:35",
+    "source": "system",
+    "sender": "AWS Alerts",
+    "title": "CRITICAL: Production database failover in us-east-1",
+    "body": "RDS Aurora cluster primary node unresponsive. Automatic failover triggered.",
+    "metadata": { "severity": "P0" }
+  },
+  {
+    "id": "demo-12",
+    "timestamp": "14:37:39",
+    "source": "slack",
+    "sender": "lisa.m",
+    "title": "Anyone want coffee downstairs?",
+    "body": "Heading down to the 2nd floor cafe if anyone wants a matcha or espresso.",
+    "metadata": { "channel": "#watercooler" }
+  },
+  {
+    "id": "demo-13",
+    "timestamp": "14:37:42",
+    "source": "email",
+    "sender": "Uber Receipts",
+    "title": "Your Tuesday afternoon trip with Uber",
+    "body": "Total: $18.42 paid with Corporate Card ending in 4091. Download tax invoice.",
+    "metadata": { "type": "receipt" }
+  },
+  {
+    "id": "demo-14",
+    "timestamp": "14:37:46",
+    "source": "agent",
+    "sender": "Canvas LMS",
+    "title": "Final Project Submission deadline moved 2 hours earlier",
+    "body": "Professor Miller moved submission cut-off to 16:00 today due to portal server maintenance.",
+    "metadata": { "course": "CS-482" }
+  },
+  {
+    "id": "demo-15",
+    "timestamp": "14:37:50",
+    "source": "discord",
+    "sender": "gamer_tag_7",
+    "title": "@everyone squad up for competitive tonight?",
+    "body": "Need 5th for ranked lobby at 8pm sharp.",
+    "metadata": { "channel": "#gaming" }
+  },
+  {
+    "id": "demo-16",
+    "timestamp": "14:37:53",
+    "source": "github",
+    "sender": "cto-dev",
+    "title": "PR #409: Hotfix for checkout payment gateway deadlock",
+    "body": "Urgent review required. Users currently experiencing 504 on Stripe webhook callbacks.",
+    "metadata": { "urgent": true }
+  },
+  {
+    "id": "demo-17",
+    "timestamp": "14:37:56",
+    "source": "system",
+    "sender": "OS Security",
+    "title": "Security update KB5034441 available for installation",
+    "body": "Patches zero-day vulnerability in BitLocker encryption service. Restart required to apply.",
+    "metadata": { "reboot": true }
+  },
+  {
+    "id": "demo-18",
+    "timestamp": "14:38:00",
+    "source": "email",
+    "sender": "Hacker Newsletter",
+    "title": "Hacker Newsletter #702: The Return of Small Software",
+    "body": "Top stories from Hacker News this week: SQLite innovations, terminal UI resurgence, and minimalism.",
+    "metadata": { "category": "newsletter" }
+  },
+  {
+    "id": "demo-19",
+    "timestamp": "14:38:03",
+    "source": "slack",
+    "sender": "pagerduty-bot",
+    "title": "[RESOLVED] High Latency on us-east-1 API Gateway",
+    "body": "Incident #9024 marked resolved by On-Call Engineer. P99 latency returned to 42ms.",
+    "metadata": { "incident": "9024" }
+  },
+  {
+    "id": "demo-20",
+    "timestamp": "14:38:07",
+    "source": "calendar",
+    "sender": "Google Calendar",
+    "title": "CANCELED: Weekly Marketing Sync",
+    "body": "Host cancelled the meeting: 'Weekly Marketing Sync' scheduled for 16:30 today.",
+    "metadata": { "cancelled": true }
+  }
+]
