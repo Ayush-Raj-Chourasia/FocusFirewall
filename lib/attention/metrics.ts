@@ -7,6 +7,18 @@ import {
 } from './types';
 import { DEFAULT_THRESHOLDS } from './policy';
 
+/**
+ * Calculates percentile using standard nearest-rank method:
+ * Rank k = ceil(p * n) (1-indexed), mapped to 0-indexed array: max(0, min(n - 1, ceil(p * n) - 1)).
+ */
+export function getNearestRankPercentile(sortedValues: number[], p: number): number {
+  if (sortedValues.length === 0) return 0;
+  const n = sortedValues.length;
+  const rank = Math.ceil(p * n);
+  const index = Math.max(0, Math.min(n - 1, rank - 1));
+  return sortedValues[index];
+}
+
 export function calculateBenchmarkMetrics(
   items: BenchmarkRunItem[],
   thresholds: ConfidenceThresholds = DEFAULT_THRESHOLDS,
@@ -173,15 +185,16 @@ export function calculateBenchmarkMetrics(
 
   const evaluatedCount = total - errorCount;
 
-  // Nearest-rank percentile calculation
+  // Standard nearest-rank percentile calculation
   latencies.sort((a, b) => a - b);
-  const p50 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.5)] : 0;
-  const p95 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.95)] : 0;
+  const p50 = getNearestRankPercentile(latencies, 0.5);
+  const p95 = getNearestRankPercentile(latencies, 0.95);
   const mean = latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0;
 
   return {
     totalScenarios: total,
-    completedScenarios: total,
+    processedScenarios: total,
+    completedScenarios: evaluatedCount,
     evaluatedCount,
     errorCount,
     routingAgreement: evaluatedCount > 0 ? Number(((agreedCount / evaluatedCount) * 100).toFixed(1)) : 0,

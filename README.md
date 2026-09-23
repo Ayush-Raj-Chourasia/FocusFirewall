@@ -62,7 +62,7 @@ npm install
 ```bash
 cp .env.example .env.local
 ```
-Add your `JEV_API_KEY` if testing against live Jev endpoints. If left empty, FocusFirewall runs in explicit `MOCK` mode with identical typed schemas and calibrated distributions.
+Add your `JEV_API_KEY` if testing against live Jev endpoints. If left empty, FocusFirewall runs in explicit `MOCK` mode with identical typed schemas and deterministic normalized policy scores.
 
 ### 3. Run Development Server
 ```bash

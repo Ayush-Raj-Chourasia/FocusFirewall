@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { applyConfidenceGate, runDeterministicFallback } from '../lib/attention/policy';
 import { calculateNewBudget, getBudgetBurnPercentage } from '../lib/attention/budget';
-import { calculateBenchmarkMetrics } from '../lib/attention/metrics';
+import { calculateBenchmarkMetrics, getNearestRankPercentile } from '../lib/attention/metrics';
 import { BenchmarkRunItem } from '../lib/attention/types';
 
 console.log('--- RUNNING FOCUSFIREWALL UNIT TESTS ---');
@@ -77,6 +77,7 @@ const sampleItems: BenchmarkRunItem[] = [
 const metrics = calculateBenchmarkMetrics(sampleItems);
 assert.strictEqual(metrics.totalScenarios, 3);
 assert.strictEqual(metrics.evaluatedCount, 2);
+assert.strictEqual(metrics.completedScenarios, 2); // completedScenarios strictly equals evaluatedCount, not totalScenarios
 assert.strictEqual(metrics.errorCount, 1);
 assert.strictEqual(metrics.routingAgreement, 100); // 2 agreed out of 2 evaluated
 assert.strictEqual(metrics.criticalRecall, 100);
@@ -84,7 +85,16 @@ assert.strictEqual(metrics.falseInterruptionRate, 0);
 assert.strictEqual(metrics.confusionMatrix.batch.batch, 1);
 assert.strictEqual(metrics.confusionMatrix.interrupt_now.interrupt_now, 1);
 assert.strictEqual(metrics.confusionMatrix.silence.silence, 0); // error was excluded
-console.log('✓ Test 6 Passed: Benchmark metrics calculation and error exclusion correct');
+console.log('✓ Test 6 Passed: Benchmark metrics calculation, error exclusion, and completedScenarios semantics correct');
+
+// Test 7: Standard Nearest-Rank Percentile Calculation
+// For [10, 20, 30, 40, 50, 60, 70, 80, 90, 100] (n=10)
+// p50 -> rank ceil(0.5 * 10) = 5 -> index 4 -> 50
+// p95 -> rank ceil(0.95 * 10) = 10 -> index 9 -> 100
+const testLatencies = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+assert.strictEqual(getNearestRankPercentile(testLatencies, 0.5), 50);
+assert.strictEqual(getNearestRankPercentile(testLatencies, 0.95), 100);
+console.log('✓ Test 7 Passed: Standard nearest-rank percentile calculation verified');
 
 // --- INVARIANT SUITE ---
 

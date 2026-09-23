@@ -78,7 +78,7 @@ export default function SettingsPage() {
               {engine === 'laya' && <span className="tag-badge bg-pink text-white">ACTIVE</span>}
             </div>
             <p className="text-ink-muted text-[11px]">
-              Open-weights System-1 decision architecture (convaiinnovations/laya). Local REST service or calibrated engine.
+              Open-weights System-1 decision architecture (convaiinnovations/laya). Local REST service or local policy engine.
             </p>
           </button>
 

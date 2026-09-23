@@ -122,6 +122,7 @@ export interface BenchmarkRunMetadata {
 
 export interface BenchmarkMetrics {
   totalScenarios: number;
+  processedScenarios?: number;
   completedScenarios: number;
   evaluatedCount: number;
   errorCount: number;
