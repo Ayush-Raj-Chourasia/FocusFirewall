@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx scripts/test-engine.ts"
+    "test": "npx tsx scripts/test-engine.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
