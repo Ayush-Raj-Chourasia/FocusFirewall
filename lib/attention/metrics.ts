@@ -150,12 +150,22 @@ export function calculateBenchmarkMetrics(
   // Calculate Context Sensitivity over paired controlled scenarios
   let pairedSetsCount = 0;
   let contextSensitivityHits = 0;
+  let contextDivergenceHits = 0;
   for (const [, pairList] of pairMap.entries()) {
     if (pairList.length >= 2) {
       pairedSetsCount += 1;
       const first = pairList[0];
       const second = pairList[1];
+      // Raw divergence: did routing change when context changed?
       if (first.expected !== second.expected && first.action !== second.action) {
+        contextDivergenceHits += 1;
+      }
+      // Strict Context Sensitivity: routed action matched intended ground-truth policy in both contexts
+      if (
+        first.expected !== second.expected &&
+        first.action === first.expected &&
+        second.action === second.expected
+      ) {
         contextSensitivityHits += 1;
       }
     }
@@ -163,6 +173,7 @@ export function calculateBenchmarkMetrics(
 
   const evaluatedCount = total - errorCount;
 
+  // Nearest-rank percentile calculation
   latencies.sort((a, b) => a - b);
   const p50 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.5)] : 0;
   const p95 = latencies.length > 0 ? latencies[Math.floor(latencies.length * 0.95)] : 0;
@@ -190,11 +201,16 @@ export function calculateBenchmarkMetrics(
       pairedSetsCount > 0
         ? Number(((contextSensitivityHits / pairedSetsCount) * 100).toFixed(1))
         : 100,
+    contextDivergence:
+      pairedSetsCount > 0
+        ? Number(((contextDivergenceHits / pairedSetsCount) * 100).toFixed(1))
+        : 100,
     confidenceCoverage:
       evaluatedCount > 0 ? Number(((aboveConfidenceThresholdCount / evaluatedCount) * 100).toFixed(1)) : 0,
     p50LatencyMs: Math.round(p50),
     p95LatencyMs: Math.round(p95),
     meanLatencyMs: Math.round(mean),
+    percentileMethod: 'nearest-rank',
     actionDistribution,
     engineBreakdown,
     difficultyBreakdown,

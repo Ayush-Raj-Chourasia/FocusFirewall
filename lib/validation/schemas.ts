@@ -21,6 +21,8 @@ export const eventSourceSchema = z.enum([
   'github',
   'calendar',
   'discord',
+  'phone',
+  'sms',
   'system',
   'agent',
   'custom',

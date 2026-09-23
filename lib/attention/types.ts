@@ -17,6 +17,8 @@ export type EventSource =
   | 'github'
   | 'calendar'
   | 'discord'
+  | 'phone'
+  | 'sms'
   | 'system'
   | 'agent'
   | 'custom';
@@ -49,7 +51,9 @@ export interface DecisionResult {
   probabilities: Record<AttentionAction, number>;
   confidence: number;
   engine: 'jev' | 'laya' | 'mock' | 'rules';
+  requestedEngine?: 'jev' | 'laya' | 'mock' | 'rules';
   latencyMs?: number;
+  latencySource?: 'measured' | 'simulated';
   requestId?: string;
   timestamp: string;
   questionVersion: string;
@@ -125,11 +129,13 @@ export interface BenchmarkMetrics {
   criticalRecall: number; // percentage (0-100)
   falseInterruptionRate: number; // percentage (0-100)
   suppressionPrecision: number; // percentage (0-100)
-  contextSensitivity: number; // percentage (0-100)
+  contextSensitivity: number; // percentage (0-100) where routed matched expected under contrasting contexts
+  contextDivergence?: number; // percentage (0-100) where routed actions diverged across contexts
   confidenceCoverage: number; // percentage (0-100)
   p50LatencyMs: number;
   p95LatencyMs: number;
   meanLatencyMs: number;
+  percentileMethod?: string;
   actionDistribution: Record<AttentionAction, number>;
   engineBreakdown: Record<string, number>;
   difficultyBreakdown: Record<string, { total: number; correct: number }>;
