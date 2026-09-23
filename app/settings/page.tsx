@@ -11,7 +11,7 @@ import {
 } from '@/lib/storage/local';
 
 export default function SettingsPage() {
-  const [engine, setEngine] = useState<'laya' | 'jev' | 'mock'>('laya');
+  const [engine, setEngine] = useState<'laya' | 'jev' | 'mock'>('mock');
   const [thresholds, setThresholds] = useState<ConfidenceThresholds>(DEFAULT_THRESHOLDS);
   const [dailyBudget, setDailyBudget] = useState<number>(100);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
@@ -30,11 +30,11 @@ export default function SettingsPage() {
 
   const handleReset = () => {
     setThresholds(DEFAULT_THRESHOLDS);
-    setEngine('laya');
+    setEngine('mock');
     setDailyBudget(100);
-    saveEnginePreference('laya');
+    saveEnginePreference('mock');
     saveStoredThresholds(DEFAULT_THRESHOLDS);
-    setSaveNotice('Reset to original default values.');
+    setSaveNotice('Reset to default values (Mock baseline mode).');
     setTimeout(() => setSaveNotice(null), 3000);
   };
 
@@ -114,7 +114,7 @@ export default function SettingsPage() {
               {engine === 'mock' && <span className="tag-badge bg-line text-white">ACTIVE</span>}
             </div>
             <p className="text-ink-muted text-[11px]">
-              Offline deterministic simulation for testing UI with fixed latency.
+              Offline deterministic baseline for testing UI with measured execution latency.
             </p>
           </button>
         </div>
@@ -128,7 +128,7 @@ export default function SettingsPage() {
         </div>
 
         <p className="text-ink-muted text-xs">
-          If Jev&apos;s decision confidence falls below these cutoffs, deterministic safety rules automatically downgrade the action (e.g. low-confidence silence downgrades to batch).
+          If the selected semantic engine&apos;s decision confidence falls below these cutoffs, deterministic safety rules automatically downgrade the action (e.g. low-confidence silence downgrades to batch).
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
