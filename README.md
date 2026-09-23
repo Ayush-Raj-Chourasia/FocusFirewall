@@ -1,6 +1,6 @@
-# FocusFirewall — The Real-Time Attention Router
+# FocusFirewall — The System-1 Attention Router
 
-> FocusFirewall is an attention router for humans. It watches incoming digital events and decides whether they should interrupt you now, be shown soon, batched for later, or silently suppressed.
+> FocusFirewall is an attention router for humans. It watches incoming digital events and decides whether they should interrupt you now, be shown soon, batched for later, or silently suppressed. Powered by Laya (`convaiinnovations/laya`) and Jev.
 
 ```
        RAW EVENT                 USER CONTEXT
@@ -10,7 +10,7 @@
            [ COMPACT STRUCTURED STATE ]
                         │
                         ▼
-                [ JEV DECISION ]
+               [ LAYA / JEV DECISION ]
          (Choice, Score, Noul Questions)
                         │
                         ▼
@@ -23,15 +23,15 @@
 
 ---
 
-## Why Jev?
+## Why System-1 (Laya & Jev)?
 
 Most existing AI builds classify **WHAT** an item is (spam vs ham, sentiment, code generation) and generate paragraphs of slow conversational prose.
 
 FocusFirewall decides **WHEN** a human should be interrupted.
 
-Jev provides sub-100ms typed decisions (`choice`, `score`, `noul`) over structured evidence without conversational tokens or hallucinated syntax. FocusFirewall pairs Jev's System-1 semantic judgment with deterministic code that enforces confidence thresholds and manages an attention scarcity budget.
+Laya provides fast typed decisions (`choice`, `score`, `noul`) over structured evidence without conversational tokens, prompt injection vectors, or hallucinated syntax. FocusFirewall pairs System-1 semantic judgment with deterministic code that enforces confidence thresholds and manages an attention scarcity budget.
 
-> **Transparency Note**: The demo simulator operates over frozen fixture datasets. Real Jev mode invokes the live Jev API when `JEV_API_KEY` is configured.
+> **Transparency Note**: The public web deployment defaults to the deterministic baseline engine. When running locally or connected to a self-hosted instance, live Laya inference runs via `server/laya_service.py`. When configured with `JEV_API_KEY`, live Jev cloud inference is invoked. All decisions expose `requestedEngine`, `engine`, and `latencySource: 'measured'` in telemetry.
 
 ---
 
@@ -41,8 +41,8 @@ Jev provides sub-100ms typed decisions (`choice`, `score`, `noul`) over structur
 2. **System-1 Typed Questions**: Evaluates Action (Choice), Urgency (Score 0-4), and 3 Noul flags (Requires Action, High Consequence, Context Conflict).
 3. **Deterministic Confidence Gate**: Low-confidence silences are safely downgraded to batching; low-confidence interrupts are downgraded to show-soon.
 4. **Attention Budget Scarcity**: Tracks daily attention credits (Interrupt = 8, Show Soon = 3, Batch = 1, Silence = 0) and feeds scarcity directly into decision context.
-5. **Frozen 400-Scenario Benchmark**: Measures routing agreement, critical recall, false interruption rate, context sensitivity, and P50/P95 latency without fabricated metrics.
-6. **Technical Replay DVR & "Why Different?" Mode**: Step through historical runs or inspect side-by-side divergent decisions for the same event under differing contexts.
+5. **Frozen 400-Scenario Benchmark**: Measures routing agreement, critical recall, false interruption rate, context sensitivity, and measured P50/P95 latency without synthetic fallbacks.
+6. **Controlled Paired Experiment**: Proves identical events across 5 distinct human contexts yield divergent, policy-compliant attention routing.
 7. **Human Override Loop**: Operator feedback buttons (`✓ Correct`, `✕ Wrong`, `Override`) recorded locally to personalize future user policy.
 
 ---
@@ -173,15 +173,16 @@ FocusFirewall strictly separates model execution into three mutually exclusive, 
 ```text
 ENGINE MODES
 ────────────────────────────────────────────────────────────────
-● JEV     Primary System-1 API (sub-100ms typed choice/score/noul)
-○ LAYA    Local/Remote open-weights service via server/laya_service.py
-○ MOCK    Local calibrated baseline with transparent engine: 'mock' badge
+● LAYA    Local/Remote open-weights service via server/laya_service.py (ModernBERT)
+○ JEV     Cloud System-1 API (sub-100ms typed choice/score/noul)
+○ MOCK    Deterministic baseline with normalized policy scores
+○ RULES   Safety-gated deterministic fallback (if remote service is offline)
 ```
 
 ### Production Deployment Clarification (Vercel vs Backend)
 - **Frontend & Edge Router**: Deployed on Vercel (`https://focusfirewall.vercel.app`). Runs Next.js 15 App Router serverless functions for `/api/decide` and `/api/events`.
-- **Laya Service**: Provided as a standalone FastAPI service in `server/laya_service.py`. For local self-hosting or deployment to GPU hosts (Modal, RunPod, Hugging Face Spaces).
-- **Network Safety Guarantee**: If an external engine times out, FocusFirewall **never** turns the error into a fake 30ms success metric. Errors are isolated, counted separately, and excluded from latency/agreement statistics.
+- **Laya Service**: Provided as a standalone service in `server/laya_service.py`. For local self-hosting or deployment to GPU hosts (Modal, RunPod, Hugging Face Spaces).
+- **Network Safety Guarantee**: If an external engine times out, FocusFirewall **never** turns the error into a fake success metric. Errors are isolated, counted separately, and excluded from latency/agreement statistics. Fallbacks are explicitly labeled `engine: 'rules'`.
 
 ---
 

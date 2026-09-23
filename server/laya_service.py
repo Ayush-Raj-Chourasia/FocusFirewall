@@ -82,8 +82,8 @@ class LayaHandler(BaseHTTPRequestHandler):
             latency_ms = round((time.perf_counter() - start) * 1000)
 
             response_data = {
-                'engine': 'laya',
-                'model': 'convaiinnovations/laya-typed-decisions',
+                'engine': 'laya' if HAS_LAYA else 'laya-rules',
+                'model': 'convaiinnovations/laya' if HAS_LAYA else 'local-heuristic-baseline',
                 'answers': answers,
                 'latency_ms': latency_ms
             }
