@@ -120,31 +120,110 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Safety & Fallback Behavior
+---
+
+## System Architecture Pipeline
 
 ```
-               [ RAW JEV ACTION ]
-                       │
-          ┌────────────┴────────────┐
-          ▼                         ▼
-   SILENCE (< 90% conf)    INTERRUPT (< 82% conf)
-          │                         │
-          ▼                         ▼
-   DOWNGRADE TO BATCH      DOWNGRADE TO SHOW SOON
+                 ┌───────────────────────────┐
+                 │       Incoming Event      │
+                 │   (Slack, GitHub, Email)  │
+                 └─────────────┬─────────────┘
+                               │
+                               ▼
+                 ┌───────────────────────────┐
+                 │    Active Context State   │
+                 │(Deep Work, Meeting, Idle) │
+                 └─────────────┬─────────────┘
+                               │
+                               ▼
+                 ┌───────────────────────────┐
+                 │     Compact JSON State    │
+                 │ (Event + Context + Budget)│
+                 └─────────────┬─────────────┘
+                               │
+                               ▼
+                 ┌───────────────────────────┐
+                 │     DECISION ENGINE       │
+                 │   ● JEV (Primary Model)   │
+                 │   ○ LAYA (Microservice)   │
+                 │   ○ MOCK (Deterministic)  │
+                 └─────────────┬─────────────┘
+                               │
+                               ▼
+                 ┌───────────────────────────┐
+                 │  Confidence / Safety Gate │
+                 │ (Threshold & Budget Check)│
+                 └─────────────┬─────────────┘
+                               │
+       ┌───────────────────────┼───────────────────────┐
+       ▼                       ▼                       ▼                       ▼
+┌──────────────┐        ┌──────────────┐        ┌──────────────┐        ┌──────────────┐
+│INTERRUPT NOW │        │  SHOW SOON   │        │    BATCH     │        │   SILENCE    │
+│(Urgent Alert)│        │(Gentle Toast)│        │(Daily Digest)│        │(Zero Popups) │
+└──────────────┘        └──────────────┘        └──────────────┘        └──────────────┘
 ```
-
-If the Jev API is unreachable or rate-limited:
-1. Urgent imminent deadlines (`<=10m`) with required action fallback to `INTERRUPT_NOW`.
-2. High consequence system alerts fallback to `SHOW_SOON`.
-3. Low-signal feeds fallback to `BATCH`.
-4. Engine is labeled `rules` with an explicit safety reason banner.
 
 ---
 
-## Known Limitations
+## Engine Boundaries & Deployment Architecture
 
-- **Simulated Stream vs Operating System Hooks**: Current version uses simulated adapters for Slack, GitHub, Discord, Email, and Calendar. Native Windows Toast notifications and Chrome Extension listeners are planned future adapters.
+FocusFirewall strictly separates model execution into three mutually exclusive, labeled modes:
+
+```text
+ENGINE MODES
+────────────────────────────────────────────────────────────────
+● JEV     Primary System-1 API (sub-100ms typed choice/score/noul)
+○ LAYA    Local/Remote open-weights service via server/laya_service.py
+○ MOCK    Local calibrated baseline with transparent engine: 'mock' badge
+```
+
+### Production Deployment Clarification (Vercel vs Backend)
+- **Frontend & Edge Router**: Deployed on Vercel (`https://focusfirewall.vercel.app`). Runs Next.js 15 App Router serverless functions for `/api/decide` and `/api/events`.
+- **Laya Service**: Provided as a standalone FastAPI service in `server/laya_service.py`. For local self-hosting or deployment to GPU hosts (Modal, RunPod, Hugging Face Spaces).
+- **Network Safety Guarantee**: If an external engine times out, FocusFirewall **never** turns the error into a fake 30ms success metric. Errors are isolated, counted separately, and excluded from latency/agreement statistics.
+
+---
+
+## Reproducible Benchmark Suite
+
+The evaluation suite (`/benchmark`) runs 400 frozen scenarios across 5 distinct human contexts (80 scenarios each):
+
+```text
+400 FROZEN EVALUATION SCENARIOS
+────────────────────────────────────────────────────
+Contexts (80 each) : DEEP WORK · STUDYING · MEETING · GAMING · IDLE
+Actions            : NOW · SOON · BATCH · SILENCE
+Ground Truth       : Pre-labeled policy expectations
+Confusion Matrix   : 4 × 4 Expected vs Routed Matrix
+Reproducibility    : Full manifest (Run ID, Policy, Dataset, Thresholds)
+```
+
+### Latency Measurement Specification
+- **Latency Metric**: P50 / P95 End-to-End Serverless HTTP API round-trip (in milliseconds).
+- **Includes**: Network transport, JSON deserialization, compact state extraction, engine execution, confidence safety gating, and response serialization.
+- **Integrity Guarantee**: Failed scenarios are marked `ERROR` and strictly excluded from latency and agreement ratios.
+
+---
+
+## Safety Invariant Verification (`npm test`)
+
+The policy engine enforces four non-negotiable mathematical invariants verified by automated tests:
+
+1. **High Consequence Invariant**: Any event with `high_consequence: true` and `action_required: true` can NEVER be silenced.
+2. **Meeting Distraction Invariant**: Low-urgency events in a `meeting` context must be gated to `SHOW_SOON` or `BATCH`.
+3. **Probability Normalization**: All output probability distributions must sum to `1.00 ± 0.01`.
+4. **Confidence Contract**: Output confidence strictly matches the maximum probability among chosen actions.
+
+Run tests locally:
+```bash
+npm test
+```
+
+---
+
+## Known Limitations & Roadmap
+
+- **Simulated Stream vs Native Hooks**: Current version uses simulated adapters for Slack, GitHub, Discord, Email, and Calendar. Native Windows Toast notifications and Chrome Extension listeners are planned future adapters.
 - **Client Storage**: Session history and feedback overrides persist in `localStorage` without a centralized SQL database.
-
----
 
